@@ -34,14 +34,26 @@ const GoalGenerator = ({ onGenerateGoals }) => {
 
   const handleSubmitPerformance = async (e) => {
     e.preventDefault();
-    const goals = await generatePerformanceGoal(orgGoals, currentWork, desiredWorkAndSkills);
-    onGenerateGoals(goals);
+    // LocalStorageに入力内容を保存
+    localStorage.setItem('orgGoals', orgGoals);
+    localStorage.setItem('currentWork', currentWork);
+    localStorage.setItem('desiredWorkAndSkills', desiredWorkAndSkills);
+    const result = await refetchPerformance();
+    if (result.data) {
+      onGenerateGoals(result.data);
+    }
   };
 
   const handleSubmitCompetency = async (e) => {
     e.preventDefault();
-    const goals = await generateCompetencyGoal(orgGoals, currentWork, desiredWorkAndSkills);
-    onGenerateGoals(goals);
+    // LocalStorageに入力内容を保存
+    localStorage.setItem('orgGoals', orgGoals);
+    localStorage.setItem('currentWork', currentWork);
+    localStorage.setItem('desiredWorkAndSkills', desiredWorkAndSkills);
+    const result = await refetchCompetency();
+    if (result.data) {
+      onGenerateGoals(result.data);
+    }
   };
 
   return (
@@ -63,22 +75,17 @@ const GoalGenerator = ({ onGenerateGoals }) => {
           onChange={(e) => setDesiredWorkAndSkills(e.target.value)}
         />
         <div className="flex space-x-4">
-          <Button onClick={handleSubmitPerformance} disabled={isLoadingPerformance}>
-            成果目標を生成
+          <Button onClick={handleSubmitPerformance} disabled={isLoadingPerformance || isLoadingCompetency}>
+            {isLoadingPerformance ? '生成中...' : '成果目標を生成'}
           </Button>
-          <Button onClick={handleSubmitCompetency} disabled={isLoadingCompetency}>
-            コンピテンシー目標を生成
+          <Button onClick={handleSubmitCompetency} disabled={isLoadingPerformance || isLoadingCompetency}>
+            {isLoadingCompetency ? '生成中...' : 'コンピテンシー目標を生成'}
           </Button>
         </div>
       </form>
-      {(generatedPerformanceGoal || generatedCompetencyGoal) && (
-        <div className="mt-4 p-4 bg-gray-100 rounded">
-          <h3 className="font-bold mb-2">生成された目標:</h3>
-          <Textarea
-            value={generatedPerformanceGoal || generatedCompetencyGoal}
-            readOnly
-            className="w-full h-64 overflow-y-auto"
-          />
+      {(isLoadingPerformance || isLoadingCompetency) && (
+        <div className="mt-4 p-4 bg-yellow-100 rounded">
+          <p className="text-center">目標を生成中です。しばらくお待ちください...</p>
         </div>
       )}
     </div>

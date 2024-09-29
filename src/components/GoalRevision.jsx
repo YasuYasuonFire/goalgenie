@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useQuery } from '@tanstack/react-query';
@@ -8,6 +8,15 @@ const GoalRevision = ({ onReviseGoals }) => {
   const [orgGoals, setOrgGoals] = useState('');
   const [personalGoals, setPersonalGoals] = useState('');
 
+  useEffect(() => {
+    // LocalStorageから前回の入力内容を取得
+    const savedOrgGoals = localStorage.getItem('revisionOrgGoals');
+    const savedPersonalGoals = localStorage.getItem('revisionPersonalGoals');
+
+    if (savedOrgGoals) setOrgGoals(savedOrgGoals);
+    if (savedPersonalGoals) setPersonalGoals(savedPersonalGoals);
+  }, []);
+
   const { data: revisedGoal, refetch, isLoading } = useQuery({
     queryKey: ['reviseGoal'],
     queryFn: () => reviseGoal(orgGoals, personalGoals),
@@ -16,8 +25,13 @@ const GoalRevision = ({ onReviseGoals }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const goals = await reviseGoal(orgGoals, personalGoals);
-    onReviseGoals(goals);
+    // LocalStorageに入力内容を保存
+    localStorage.setItem('revisionOrgGoals', orgGoals);
+    localStorage.setItem('revisionPersonalGoals', personalGoals);
+    const result = await refetch();
+    if (result.data) {
+      onReviseGoals(result.data);
+    }
   };
 
   return (
@@ -34,9 +48,14 @@ const GoalRevision = ({ onReviseGoals }) => {
           onChange={(e) => setPersonalGoals(e.target.value)}
         />
         <Button type="submit" disabled={isLoading}>
-          目標を修正
+          {isLoading ? '修正中...' : '目標を修正'}
         </Button>
       </form>
+      {isLoading && (
+        <div className="mt-4 p-4 bg-yellow-100 rounded">
+          <p className="text-center">目標を修正中です。しばらくお待ちください...</p>
+        </div>
+      )}
     </div>
   );
 };

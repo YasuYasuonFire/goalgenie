@@ -30,13 +30,7 @@ const Index = () => {
             <div className="mt-4 p-4 bg-gray-100 rounded">
               <h3 className="font-bold mb-2">生成された目標:</h3>
               <div className="prose max-w-none">
-                <ReactMarkdown
-                  components={{
-                    p: ({ node, ...props }) => <p style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }} {...props} />
-                  }}
-                >
-                  {generatedGoals}
-                </ReactMarkdown>
+                <ReactMarkdown>{generatedGoals}</ReactMarkdown>
               </div>
             </div>
           )}
@@ -47,13 +41,7 @@ const Index = () => {
             <div className="mt-4 p-4 bg-gray-100 rounded">
               <h3 className="font-bold mb-2">修正された目標:</h3>
               <div className="prose max-w-none">
-                <ReactMarkdown
-                  components={{
-                    p: ({ node, ...props }) => <p style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }} {...props} />
-                  }}
-                >
-                  {revisedGoals}
-                </ReactMarkdown>
+                <ReactMarkdown>{revisedGoals}</ReactMarkdown>
               </div>
             </div>
           )}
