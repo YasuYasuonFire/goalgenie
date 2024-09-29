@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useQuery } from '@tanstack/react-query';
-import { generateGoal } from '../utils/api';
+import { generatePerformanceGoal, generateCompetencyGoal } from '../utils/api';
 
-const GoalGenerator = () => {
+const GoalGenerator = ({ onGenerateGoals }) => {
   const [orgGoals, setOrgGoals] = useState('');
   const [currentWork, setCurrentWork] = useState('');
   const [desiredWorkAndSkills, setDesiredWorkAndSkills] = useState('');
@@ -20,24 +20,33 @@ const GoalGenerator = () => {
     if (savedDesiredWorkAndSkills) setDesiredWorkAndSkills(savedDesiredWorkAndSkills);
   }, []);
 
-  const { data: generatedGoal, refetch, isLoading } = useQuery({
-    queryKey: ['generateGoal'],
-    queryFn: () => generateGoal(orgGoals, currentWork, desiredWorkAndSkills),
+  const { data: generatedPerformanceGoal, refetch: refetchPerformance, isLoading: isLoadingPerformance } = useQuery({
+    queryKey: ['generatePerformanceGoal'],
+    queryFn: () => generatePerformanceGoal(orgGoals, currentWork, desiredWorkAndSkills),
     enabled: false,
   });
 
-  const handleSubmit = (e) => {
+  const { data: generatedCompetencyGoal, refetch: refetchCompetency, isLoading: isLoadingCompetency } = useQuery({
+    queryKey: ['generateCompetencyGoal'],
+    queryFn: () => generateCompetencyGoal(orgGoals, currentWork, desiredWorkAndSkills),
+    enabled: false,
+  });
+
+  const handleSubmitPerformance = async (e) => {
     e.preventDefault();
-    // LocalStorageに入力内容を保存
-    localStorage.setItem('orgGoals', orgGoals);
-    localStorage.setItem('currentWork', currentWork);
-    localStorage.setItem('desiredWorkAndSkills', desiredWorkAndSkills);
-    refetch();
+    const goals = await generatePerformanceGoal(orgGoals, currentWork, desiredWorkAndSkills);
+    onGenerateGoals(goals);
+  };
+
+  const handleSubmitCompetency = async (e) => {
+    e.preventDefault();
+    const goals = await generateCompetencyGoal(orgGoals, currentWork, desiredWorkAndSkills);
+    onGenerateGoals(goals);
   };
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form className="space-y-4">
         <Textarea
           placeholder="組織目標"
           value={orgGoals}
@@ -53,14 +62,23 @@ const GoalGenerator = () => {
           value={desiredWorkAndSkills}
           onChange={(e) => setDesiredWorkAndSkills(e.target.value)}
         />
-        <Button type="submit" disabled={isLoading}>
-          目標を生成
-        </Button>
+        <div className="flex space-x-4">
+          <Button onClick={handleSubmitPerformance} disabled={isLoadingPerformance}>
+            成果目標を生成
+          </Button>
+          <Button onClick={handleSubmitCompetency} disabled={isLoadingCompetency}>
+            コンピテンシー目標を生成
+          </Button>
+        </div>
       </form>
-      {generatedGoal && (
+      {(generatedPerformanceGoal || generatedCompetencyGoal) && (
         <div className="mt-4 p-4 bg-gray-100 rounded">
           <h3 className="font-bold mb-2">生成された目標:</h3>
-          <p style={{ whiteSpace: 'pre-line' }}>{generatedGoal}</p>
+          <Textarea
+            value={generatedPerformanceGoal || generatedCompetencyGoal}
+            readOnly
+            className="w-full h-64 overflow-y-auto"
+          />
         </div>
       )}
     </div>

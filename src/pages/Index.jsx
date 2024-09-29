@@ -2,9 +2,20 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GoalGenerator from '../components/GoalGenerator';
 import GoalRevision from '../components/GoalRevision';
-import PerformanceAdvice from '../components/PerformanceAdvice';
+import ReactMarkdown from 'react-markdown'; // マークダウンレンダリング用
 
 const Index = () => {
+  const [generatedGoals, setGeneratedGoals] = React.useState('');
+  const [revisedGoals, setRevisedGoals] = React.useState('');
+
+  const handleGenerateGoals = (goals) => {
+    setGeneratedGoals(goals);
+  };
+
+  const handleReviseGoals = (goals) => {
+    setRevisedGoals(goals);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">人事評価支援ツール</h1>
@@ -12,16 +23,40 @@ const Index = () => {
         <TabsList>
           <TabsTrigger value="generate">目標生成</TabsTrigger>
           <TabsTrigger value="revise">目標修正</TabsTrigger>
-          <TabsTrigger value="advice">成果アピール</TabsTrigger>
         </TabsList>
         <TabsContent value="generate">
-          <GoalGenerator />
+          <GoalGenerator onGenerateGoals={handleGenerateGoals} />
+          {generatedGoals && (
+            <div className="mt-4 p-4 bg-gray-100 rounded">
+              <h3 className="font-bold mb-2">生成された目標:</h3>
+              <div className="prose max-w-none">
+                <ReactMarkdown
+                  components={{
+                    p: ({ node, ...props }) => <p style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }} {...props} />
+                  }}
+                >
+                  {generatedGoals}
+                </ReactMarkdown>
+              </div>
+            </div>
+          )}
         </TabsContent>
         <TabsContent value="revise">
-          <GoalRevision />
-        </TabsContent>
-        <TabsContent value="advice">
-          <PerformanceAdvice />
+          <GoalRevision onReviseGoals={handleReviseGoals} />
+          {revisedGoals && (
+            <div className="mt-4 p-4 bg-gray-100 rounded">
+              <h3 className="font-bold mb-2">修正された目標:</h3>
+              <div className="prose max-w-none">
+                <ReactMarkdown
+                  components={{
+                    p: ({ node, ...props }) => <p style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }} {...props} />
+                  }}
+                >
+                  {revisedGoals}
+                </ReactMarkdown>
+              </div>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

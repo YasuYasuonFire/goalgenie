@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useQuery } from '@tanstack/react-query';
 import { reviseGoal } from '../utils/api';
 
-const GoalRevision = () => {
+const GoalRevision = ({ onReviseGoals }) => {
   const [orgGoals, setOrgGoals] = useState('');
   const [personalGoals, setPersonalGoals] = useState('');
 
@@ -14,9 +14,10 @@ const GoalRevision = () => {
     enabled: false,
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    refetch();
+    const goals = await reviseGoal(orgGoals, personalGoals);
+    onReviseGoals(goals);
   };
 
   return (
@@ -36,12 +37,6 @@ const GoalRevision = () => {
           目標を修正
         </Button>
       </form>
-      {revisedGoal && (
-        <div className="mt-4 p-4 bg-gray-100 rounded">
-          <h3 className="font-bold mb-2">修正案:</h3>
-          <p>{revisedGoal}</p>
-        </div>
-      )}
     </div>
   );
 };
