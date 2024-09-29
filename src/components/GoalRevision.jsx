@@ -8,6 +8,8 @@ const GoalRevision = ({ onReviseGoals }) => {
   const [orgGoals, setOrgGoals] = useState('');
   const [personalGoals, setPersonalGoals] = useState('');
 
+  const [isRevising, setIsRevising] = useState(false);
+
   useEffect(() => {
     // LocalStorageから前回の入力内容を取得
     const savedOrgGoals = localStorage.getItem('revisionOrgGoals');
@@ -17,7 +19,7 @@ const GoalRevision = ({ onReviseGoals }) => {
     if (savedPersonalGoals) setPersonalGoals(savedPersonalGoals);
   }, []);
 
-  const { data: revisedGoal, refetch, isLoading } = useQuery({
+  const { refetch } = useQuery({
     queryKey: ['reviseGoal'],
     queryFn: () => reviseGoal(orgGoals, personalGoals),
     enabled: false,
@@ -25,12 +27,17 @@ const GoalRevision = ({ onReviseGoals }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsRevising(true);
     // LocalStorageに入力内容を保存
     localStorage.setItem('revisionOrgGoals', orgGoals);
     localStorage.setItem('revisionPersonalGoals', personalGoals);
-    const result = await refetch();
-    if (result.data) {
-      onReviseGoals(result.data);
+    try {
+      const result = await refetch();
+      if (result.data) {
+        onReviseGoals(result.data);
+      }
+    } finally {
+      setIsRevising(false);
     }
   };
 
@@ -47,11 +54,11 @@ const GoalRevision = ({ onReviseGoals }) => {
           value={personalGoals}
           onChange={(e) => setPersonalGoals(e.target.value)}
         />
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? '修正中...' : '目標を修正'}
+        <Button type="submit" disabled={isRevising}>
+          {isRevising ? '修正中...' : '目標を修正'}
         </Button>
       </form>
-      {isLoading && (
+      {isRevising && (
         <div className="mt-4 p-4 bg-yellow-100 rounded">
           <p className="text-center">目標を修正中です。しばらくお待ちください...</p>
         </div>
