@@ -18,7 +18,7 @@ const Index = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">人事評価支援ツール</h1>
+      <h1 className="text-3xl font-bold mb-6">目標設定お助けさん</h1>
       <Tabs defaultValue="generate">
         <TabsList>
           <TabsTrigger value="generate">目標生成</TabsTrigger>
