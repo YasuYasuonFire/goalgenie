@@ -42,24 +42,36 @@ const GoalRevision = ({ onReviseGoals }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Textarea
-          placeholder="組織目標"
-          value={orgGoals}
-          onChange={(e) => setOrgGoals(e.target.value)}
-        />
-        <Textarea
-          placeholder="現在の個人目標"
-          value={personalGoals}
-          onChange={(e) => setPersonalGoals(e.target.value)}
-        />
-        <Button type="submit" disabled={isRevising}>
-          {isRevising ? '修正中...' : '目標を修正'}
-        </Button>
+        <div className="space-y-2">
+          <label htmlFor="orgGoals" className="block text-sm font-medium text-green-700">組織目標</label>
+          <Textarea
+            id="orgGoals"
+            placeholder="組織目標を入力してください"
+            value={orgGoals}
+            onChange={(e) => setOrgGoals(e.target.value)}
+            className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="personalGoals" className="block text-sm font-medium text-green-700">現在の個人目標</label>
+          <Textarea
+            id="personalGoals"
+            placeholder="現在の個人目標を入力してください"
+            value={personalGoals}
+            onChange={(e) => setPersonalGoals(e.target.value)}
+            className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+        <div className="flex justify-center">
+          <Button type="submit" disabled={isRevising} className="bg-green-600 hover:bg-green-700 text-white">
+            {isRevising ? '修正中...' : '目標を修正'}
+          </Button>
+        </div>
       </form>
       {isRevising && (
-        <div className="mt-4 p-4 bg-yellow-100 rounded">
+        <div className="mt-4 p-4 bg-green-100 rounded-md text-green-800">
           <p className="text-center">目標を修正中です。しばらくお待ちください...</p>
         </div>
       )}
